@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MedMart - Nguyễn Cao Đạt (2516030028)</title>
+    <title>MedMart - Cửa Hàng Thiết Bị Y Tế Chính Hãng</title>
     <style>
         :root {
             --primary: #00b4d8;
@@ -45,20 +45,37 @@
 
         .logo span { color: var(--secondary); }
 
-        .user-info {
-            background-color: #e0f2fe;
-            color: var(--primary-dark);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            border: 1px solid #bae6fd;
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+            margin: 0;
+            padding: 0;
         }
 
-        .nav-actions {
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--primary); }
+
+        .nav-right {
             display: flex;
             align-items: center;
             gap: 20px;
+        }
+
+        .user-info {
+            font-size: 14px;
+            color: var(--text-dark);
+            font-weight: 600;
+            background: #e0f2fe;
+            padding: 8px 15px;
+            border-radius: 15px;
+            border: 1px solid #bae6fd;
         }
 
         .cart-icon-btn {
@@ -128,7 +145,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
+            font-size: 48px; /* Dùng tạm Emoji làm hình ảnh mẫu */
         }
 
         .product-info {
@@ -218,15 +235,10 @@
             background-color: var(--text-dark);
             color: white;
             text-align: center;
-            padding: 25px;
+            padding: 20px;
             margin-top: 40px;
             font-size: 14px;
-            line-height: 1.8;
-        }
-        
-        footer .student-sig {
-            color: var(--primary);
-            font-weight: bold;
+            line-height: 1.6;
         }
     </style>
 </head>
@@ -234,8 +246,17 @@
 
     <nav>
         <a href="#" class="logo">Med<span>Mart</span></a>
-        <div class="nav-actions">
-            <div class="user-info"> 👤 Nguyễn Cao Đạt - 2516030028</div>
+        <ul class="nav-links">
+            <li><a href="#">Trang Chủ</a></li>
+            <li><a href="#">Sản Phẩm</a></li>
+            <li><a href="#">Chứng Nhận Y Tế</a></li>
+            <li><a href="#">Liên Hệ</a></li>
+        </ul>
+        <div class="nav-right">
+            <!-- Thêm thông tin sinh viên trên thanh Navbar -->
+            <div class="user-info">
+                👤 Nguyễn Cao Đạt - 2516030028
+            </div>
             <button class="cart-icon-btn" onclick="scrollToCart()">
                 🛒 Giỏ Hàng (<span id="cart-count">0</span>)
             </button>
@@ -257,19 +278,19 @@
                 <p style="color: #777;">Chưa có sản phẩm nào trong giỏ hàng.</p>
             </div>
             <div class="cart-total">Tổng thanh toán: <span id="cart-total-price" style="color:var(--danger)">0đ</span></div>
-            
             <button class="btn-checkout" onclick="checkoutAlert()">Tiến Hành Đặt Hàng</button>
-            
             <div style="clear: both;"></div>
         </div>
     </div>
 
     <footer>
+        <!-- Thêm thông tin sinh viên vào vùng Footer -->
         <p>© 2026 MedMart - Hệ thống phân phối thiết bị y tế đạt chuẩn ISO 13485.</p>
-        <p>Phát triển và Quản trị bởi sinh viên: <span class="student-sig">Nguyễn Cao Đạt</span> | Mã số sinh viên: <span class="student-sig">2516030028</span></p>
+        <p style="color: #a0aec0; margin-top: 5px; font-size: 13px;">Sinh viên thực hiện: <strong>Nguyễn Cao Đạt</strong> | MSV: <strong>2516030028</strong></p>
     </footer>
 
     <script>
+        // Mảng danh sách sản phẩm y tế giả lập
         const products = [
             { id: 101, name: "Máy Đo Huyết Áp Điện Tử Bắp Tay", price: 850000, tag: "Theo dõi tại nhà", icon: "🩺" },
             { id: 102, name: "Máy Đo Nồng Độ Oxy Cầm Tay SpO2", price: 420000, tag: "Thiết bị bỏ túi", icon: "🩸" },
@@ -279,11 +300,14 @@
             { id: 106, name: "Máy Tạo Oxy Y Tế Gia Đình 5 Lít", price: 8900000, tag: "Hỗ trợ thở khẩn cấp", icon: "🔋" }
         ];
 
+        // Mảng lưu trữ trạng thái giỏ hàng hiện tại
         let cart = [];
 
+        // HÀM HIỂN THỊ DANH SÁCH SẢN PHẨM LÊN GIAO DIỆN
         function displayProducts() {
             const container = document.getElementById('product-container');
             container.innerHTML = "";
+            
             products.forEach(p => {
                 const card = `
                     <div class="product-card">
@@ -300,6 +324,7 @@
             });
         }
 
+        // HÀM THÊM SẢN PHẨM VÀO GIỎ HÀNG
         function addToCart(productId) {
             const product = products.find(p => p.id === productId);
             const cartItem = cart.find(item => item.id === productId);
@@ -312,10 +337,13 @@
             updateCartUI();
         }
 
+        // HÀM CẬP NHẬT GIAO DIỆN GIỎ HÀNG VÀ TÍNH TỔNG TIỀN
         function updateCartUI() {
+            // Cập nhật số lượng trên badge biểu tượng navbar
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
             document.getElementById('cart-count').innerText = totalItems;
 
+            // Cập nhật chi tiết vùng giỏ hàng bên dưới
             const cartListContainer = document.getElementById('cart-items-list');
             const totalPriceContainer = document.getElementById('cart-total-price');
             
@@ -350,26 +378,29 @@
             totalPriceContainer.innerText = totalMoney.toLocaleString('vi-VN') + " đ";
         }
 
+        // HÀM XÓA SẢN PHẨM KHỎI GIỎ HÀNG
         function removeFromCart(productId) {
             cart = cart.filter(item => item.id !== productId);
             updateCartUI();
         }
 
+        // CUỘN TRANG XUỐNG VÙNG GIỎ HÀNG KHI BẤM NÚT TRÊN NAVBAR
         function scrollToCart() {
             document.getElementById('cart-anchor').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // HÀM HIỂN THỊ THÔNG BÁO XÁC NHẬN ĐƠN HÀNG ĐỘC LẬP
+        // THÔNG BÁO KHI BẤM ĐẶT HÀNG
         function checkoutAlert() {
-            if (cart.length === 0) {
+            if(cart.length === 0) {
                 alert("Giỏ hàng của bạn đang trống!");
             } else {
-                alert("Yêu cầu đơn hàng đã được ghi nhận thành công tại MedMart!\nChúng tôi sẽ sớm liên hệ lại để xác nhận đơn hàng.");
+                alert("Yêu cầu đơn hàng đã được gửi! Chúng tôi sẽ liên hệ để xác nhận cấu hình thiết bị y tế phù hợp.");
                 cart = [];
                 updateCartUI();
             }
         }
 
+        // Chạy khởi tạo danh sách khi tải xong trang web
         window.onload = displayProducts;
     </script>
 </body>
