@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phân Tích Dữ Liệu Parkinson Giả Lập</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #18bc9c;
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 { margin: 0; font-size: 24px; }
+        h2 { color: var(--primary-color); border-bottom: 2px solid var(--secondary-color); padding-bottom: 8px; margin-top: 30px; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        table, th, td {
+            border: 1px solid #dee2e6;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        td {
+            padding: 10px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .metric:last-child { border: none; }
+        .metric-value { font-weight: bold; color: var(--secondary-color); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Hệ Thống Phân Tích Số Liệu Bệnh Parkinson (Giả Lập)</h1>
+        <p>Tự động tính toán phân tích mô tả và phân tích nhóm</p>
+    </header>
+
+    <div class="card">
+        <h2>1. Dữ liệu bệnh nhân gốc (Tương đương file .csv)</h2>
+        <div class="table-container">
+            <table id="data-table">
+                <thead>
+                    <tr>
+                        <th>Mã BN</th>
+                        <th>Tuổi</th>
+                        <th>Giới tính</th>
+                        <th>Số năm bệnh</th>
+                        <th>Điểm UPDRS</th>
+                        <th>Mức độ run</th>
+                        <th>Nhận thức</th>
+                        <th>Đáp ứng thuốc</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h2>2. Phân Tích Mô Tả (Descriptive)</h2>
+            <div id="descriptive-analysis">
+                <div class="metric"><span>Tổng số bệnh nhân:</span> <span class="metric-value" id="total-patients">0</span></div>
+                <div class="metric"><span>Tuổi trung bình:</span> <span class="metric-value" id="avg-age">0</span></div>
+                <div class="metric"><span>Khoảng tuổi (Min - Max):</span> <span class="metric-value" id="age-range">0</span></div>
+                <div class="metric"><span>Điểm UPDRS trung bình:</span> <span class="metric-value" id="avg-updrs">0</span></div>
+                <div class="metric"><span>Tỷ lệ Nam / Nữ:</span> <span
