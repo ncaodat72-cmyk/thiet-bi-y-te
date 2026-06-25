@@ -3,138 +3,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phân Tích Dữ Liệu Parkinson Giả Lập</title>
+    <title>Dashboard Thiết Bị Y Tế - Giám Sát Sinh Hiệu</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #18bc9c;
-            --bg-color: #f8f9fa;
-            --text-color: #333;
+            --bg-main: #f0f4f8;
+            --primary: #2c3e50;
             --card-bg: #ffffff;
+            --safe: #2ecc71;
+            --warning: #f1c40f;
+            --danger: #e74c3c;
+            --text: #333;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: var(--bg-main);
+            color: var(--text);
             margin: 0;
             padding: 20px;
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
         header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            background: linear-gradient(135deg, var(--primary), #34495e);
             color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
         }
 
-        h1 { margin: 0; font-size: 24px; }
-        h2 { color: var(--primary-color); border-bottom: 2px solid var(--secondary-color); padding-bottom: 8px; margin-top: 30px; }
+        header h1 { margin: 0; font-size: 26px; letter-spacing: 1px; }
+        header p { margin: 5px 0 0 0; opacity: 0.8; font-size: 14px; }
 
-        .grid {
+        /* Lưới hiển thị các thông số (Vital Signs) */
+        .vitals-grid {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .vital-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 8px solid var(--safe);
+            transition: all 0.3s ease;
+        }
+
+        .vital-card.alert {
+            border-left-color: var(--danger);
+            animation: pulse 1.5s infinite;
+        }
+
+        .vital-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+
+        .vital-value {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: var(--primary);
+        }
+
+        .vital-unit { font-size: 18px; font-weight: normal; color: #95a5a6; }
+
+        .vital-status {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--safe);
+        }
+
+        .vital-card.alert .vital-status { color: var(--danger); }
+
+        /* Khu vực đồ thị và Nhật ký hệ thống */
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
             gap: 20px;
         }
 
-        @media (min-width: 768px) {
-            .grid { grid-template-columns: 1fr 1fr; }
+        @media (max-width: 900px) {
+            .main-content { grid-template-columns: 1fr; }
         }
 
-        .card {
+        .chart-container, .log-container {
             background: var(--card-bg);
+            border-radius: 12px;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        .table-container {
-            overflow-x: auto;
-            margin-top: 15px;
+        .log-container h3 { margin-top: 0; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        
+        .log-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 250px;
+            overflow-y: auto;
+            font-size: 13px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        table, th, td {
-            border: 1px solid #dee2e6;
-        }
-
-        th {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 10px;
-            text-align: left;
-        }
-
-        td {
-            padding: 10px;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        .metric {
+        .log-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px dashed #eee;
         }
 
-        .metric:last-child { border: none; }
-        .metric-value { font-weight: bold; color: var(--secondary-color); }
+        .log-item.danger { color: var(--danger); font-weight: bold; background-color: #fdf2f2; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>Hệ Thống Phân Tích Số Liệu Bệnh Parkinson (Giả Lập)</h1>
-        <p>Tự động tính toán phân tích mô tả và phân tích nhóm</p>
+        <h1>Hệ Thống Trung Tâm Giám Sát Thiết Bị Y Tế v1.0.2</h1>
+        <p>Kết nối phần cứng IoT MedTech • Dữ liệu cập nhật thời gian thực (Giả lập)</p>
     </header>
 
-    <div class="card">
-        <h2>1. Dữ liệu bệnh nhân gốc (Tương đương file .csv)</h2>
-        <div class="table-container">
-            <table id="data-table">
-                <thead>
-                    <tr>
-                        <th>Mã BN</th>
-                        <th>Tuổi</th>
-                        <th>Giới tính</th>
-                        <th>Số năm bệnh</th>
-                        <th>Điểm UPDRS</th>
-                        <th>Mức độ run</th>
-                        <th>Nhận thức</th>
-                        <th>Đáp ứng thuốc</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    </tbody>
-            </table>
+    <div class="vitals-grid">
+        <div class="vital-card" id="card-hr">
+            <div class="vital-title">Nhịp Tim (Heart Rate)</div>
+            <div class="vital-value"><span id="val-hr">75</span> <span class="vital-unit">BPM</span></div>
+            <div class="vital-status" id="status-hr">Ổn định</div>
+        </div>
+
+        <div class="vital-card" id="card-spo2">
+            <div class="vital-title">Nồng Độ Oxy (SpO2)</div>
+            <div class="vital-value"><span id="val-spo2">98</span> <span class="vital-unit">%</span></div>
+            <div class="vital-status" id="status-spo2">Bình thường</div>
+        </div>
+
+        <div class="vital-card" id="card-temp">
+            <div class="vital-title">Thân Nhiệt (Temperature)</div>
+            <div class="vital-value"><span id="val-temp">36.7</span> <span class="vital-unit">°C</span></div>
+            <div class="vital-status" id="status-temp">Bình thường</div>
         </div>
     </div>
 
-    <div class="grid">
-        <div class="card">
-            <h2>2. Phân Tích Mô Tả (Descriptive)</h2>
-            <div id="descriptive-analysis">
-                <div class="metric"><span>Tổng số bệnh nhân:</span> <span class="metric-value" id="total-patients">0</span></div>
-                <div class="metric"><span>Tuổi trung bình:</span> <span class="metric-value" id="avg-age">0</span></div>
-                <div class="metric"><span>Khoảng tuổi (Min - Max):</span> <span class="metric-value" id="age-range">0</span></div>
-                <div class="metric"><span>Điểm UPDRS trung bình:</span> <span class="metric-value" id="avg-updrs">0</span></div>
-                <div class="metric"><span>Tỷ lệ Nam / Nữ:</span> <span
+    <div class="main-content">
+        <div class="chart-container">
+            <h3 style="margin-top:0; color: var(--primary);">Đồ thị điện tâm đồ (ECG) thời gian thực</h3>
+            <canvas id="ecgChart" height="120"></canvas>
+        </div>
+
+        <div class="log-container">
+            <h3>Nhật Ký Cảnh Báo Hệ Thống</h3>
+            <ul class="log-list" id="log-list">
+                <li class="log-item"><span>[System] Thiết bị đã kết nối thành công.</span><span>Vừa xong</span></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- 1. Khởi tạo Đồ thị ECG (Sử dụng Chart.js) ---
+    const ctx = document.getElementById('ecgChart').getContext('2d');
+    const maxDataPoints = 30;
+    const ecgLabels = Array.from({length: maxDataPoints}, (_, i) => "");
+    const ecgData = Array.from({length: maxDataPoints}, () => 0);
+
+    const ecgChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ecgLabels,
+            datasets: [{
+                label: 'Tín hiệu ECG (mV)',
+                data: ecgData,
+                borderColor: '#2ecc71',
+                borderWidth: 2,
+                pointRadius: 0,
+                fill: false,
+                tension: 0.4
+            }]
+        },
+        options: {
+            scales: {
+                y: { min: -1.5, max: 2.5 },
+                x: { display: false }
+            },
+            plugins: { legend: { display: false } },
+            animation: false
+        }
+    });
+
+    // --- 2. Giả lập luồng dữ liệu liên tục từ Phần cứng gửi về ---
+    let tick = 0;
+    setInterval(() => {
+        // Tạo sóng mô phỏng ECG tuần hoàn
+        tick++;
+        let ecgSample = 0;
+        let p = tick % 10;
+        if (p === 3) ecgSample = 2.0;       // Sóng R cao vọt
+        else if (p === 4) ecgSample = -0.5;  // Sóng S xuống sâu
+        else if (p === 2 || p === 5) ecgSample = 0.2; // Sóng P và T nhỏ
+        else ecgSample = 0;                  // Đường đẳng điện
+
+        // Thêm nhiễu nhẹ cho thực tế
+        ecgSample += (Math.random() - 0.5) * 0.1;
+
+        // Cập nhật đồ thị
+        ecgData.push(ecgSample);
+        ecgData.shift();
+        ecgChart.update();
+    }, 100);
+
+    // Cập nhật các chỉ số sinh tồn sau mỗi 2 giây
+    setInterval(() => {
+        // Giả lập dữ liệu sinh tồn ngẫu nhiên xung quanh ngưỡng bình thường
+        let hr = Math.floor(65 + Math.random() * 20);
+        let spo2 = Math.floor(95 + Math.random() * 5);
+        let temp = (36.5 + Math.random() * 0.5).toFixed(1);
+
+        // Tạo tình huống giả lập bất thường ngẫu nhiên để test cảnh báo (5% cơ hội bị tụt oxy)
+        if (Math.random() < 0.05) {
+            spo2 = 91; 
+            hr = 115;
+        }
+
+        // Cập nhật giao diện Nhịp Tim
+        document.getElementById('val-hr').innerText = hr;
+        
+        // Cập nhật giao diện SpO2 & Xử lý cảnh báo y tế lâm sàng
+        document.getElementById('val-spo2').innerText = spo2;
+        const cardSpO2 = document.getElementById('card-spo2');
+        const statusSpO2 = document.getElementById('status-spo2');
+
+        if (spo2 < 94) {
+            cardSpO2.classList.add('alert');
+            statusSpO2.innerText = "CẢNH BÁO: Suy hô hấp (SpO2 Thấp!)";
+            addLog("Cảnh báo: Phát hiện SpO2 tụt nguy hiểm: " + spo2 + "%", "danger");
+        } else {
+            cardSpO2.classList.remove('alert');
+            statusSpO2.innerText = "Bình thường";
+        }
+
+        // Cập nhật giao diện Thân nhiệt
+        document.getElementById('val-temp').innerText = temp;
+
+    }, 2000);
+
+    // Hàm ghi nhật ký cảnh báo hệ thống
+    function addLog(message, type = "") {
+        const logList = document.getElementById('log-list');
+        const now = new Date();
+        const timeStr = now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0');
+        
+        const li = document.createElement('li');
+        li.className = `log-item ${type}`;
+        li.innerHTML = `<span>[${timeStr}] ${message}</span><span>Bây giờ</span>`;
+        
+        logList.insertBefore(li, logList.firstChild);
+    }
+</script>
+</body>
+</html>
